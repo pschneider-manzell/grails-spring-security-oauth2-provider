@@ -1,3 +1,5 @@
+import grails.plugin.springsecurity.SecurityFilterPosition
+
 /* Copyright 2006-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
@@ -13,7 +15,6 @@
  * limitations under the License.
  */
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 
 security {
 	oauthProvider {

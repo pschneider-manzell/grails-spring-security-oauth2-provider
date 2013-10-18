@@ -28,13 +28,15 @@ grails.project.dependency.resolution = {
 
 //		mavenLocal()
 		mavenCentral()
+
+        mavenRepo "http://repo.spring.io/milestone/"
 	}
 
 	dependencies {
 //		compile('org.springframework.security:spring-security-crypto:3.1.4.RELEASE') {
 //			excludes 'spring-core', 'commons-logging'
 //		}
-		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.4.RELEASE', {
+		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.5.RELEASE', {
 			transitive = false
 		}
 		compile 'org.springframework.security:spring-security-config:3.0.7.RELEASE', {
@@ -54,12 +56,12 @@ grails.project.dependency.resolution = {
 		}
 
 		// Testing
-		test ':code-coverage:1.2.4', {
+		test ':code-coverage:1.2.6', {
 			export = false
 		}
 		test ':codenarc:0.15', {
 			export = false
 		}
-		compile ':spring-security-core:1.2.7.3'
+		compile ':spring-security-core:2.0-RC2'
 	}
 }
