@@ -53,7 +53,6 @@ grails.project.dependency.resolution = {
 
 	dependencies {
 
-
 //		compile('org.springframework.security:spring-security-crypto:3.1.4.RELEASE') {
 //			excludes 'spring-core', 'commons-logging'
 //		}
@@ -72,6 +71,15 @@ grails.project.dependency.resolution = {
 	}
 	
 	plugins {
+        // plugins for the build system only
+        build (":tomcat:7.0.42") {
+            export = false
+        }
+
+        // plugins needed at runtime but not for compilation
+        runtime (":hibernate:3.6.10.2") {  // or ":hibernate4:4.1.11.2"
+            export = false
+        }
 		// Release
 		build (':release:2.2.1') {
 			export = false

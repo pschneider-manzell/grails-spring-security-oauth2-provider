@@ -1,14 +1,20 @@
+import grails.plugin.springsecurity.SecurityFilterPosition
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
+
+grails.plugin.springsecurity.rejectIfNoRule = false
+grails.plugin.springsecurity.fii.rejectPublicInvocations = false
 
 // Secure the oauth endpoints
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/oauth/authorize.dispatch':['ROLE_ADMIN'],
+
 ]
 // Added by the Spring Security Core plugin:
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'test.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'test.UserRole'
 grails.plugin.springsecurity.authority.className = 'test.Role'
+grails.plugin.springsecurity.oauthProvider.filterStartPosition = SecurityFilterPosition.X509_FILTER.order // The starting location of the filters registered
 
 grails.plugin.springsecurity.oauthProvider.clients = [
 	[
@@ -23,9 +29,9 @@ grails.serverURL = "http://localhost:8080/oauth2"
 log4j = {
 	debug	'grails.app.bootstrap.BootStrap',
 			'grails.app',
-			'grails.plugin.springsecurity.oauthprovider'
-	info	'org.hibernate.SQL',
-			'org.springframework.security'
+			'grails.plugin.springsecurity.oauthprovider',
+            'org.springframework.security'
+	info	'org.hibernate.SQL'
 	error	'org.codehaus.groovy.grails.web.servlet',	//	controllers
 			'org.codehaus.groovy.grails.web.pages', 	//	GSP
 			'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
