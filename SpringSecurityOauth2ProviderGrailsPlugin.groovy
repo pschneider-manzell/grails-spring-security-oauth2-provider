@@ -14,7 +14,14 @@
  */
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger
+import org.springframework.http.converter.ByteArrayHttpMessageConverter
+import org.springframework.http.converter.FormHttpMessageConverter
+import org.springframework.http.converter.StringHttpMessageConverter
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
+import org.springframework.http.converter.xml.SourceHttpMessageConverter
+import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter
+import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices
 import org.springframework.security.oauth2.provider.InMemoryClientDetailsService
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
@@ -22,6 +29,7 @@ import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
 import grails.plugin.springsecurity.oauthprovider.SpringSecurityOAuth2ProviderUtility
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 
 class SpringSecurityOauth2ProviderGrailsPlugin {
 	static Logger log = Logger.getLogger('grails.app.bootstrap.BootStrap')
@@ -77,6 +85,17 @@ OAuth2 Provider support for the Spring Security plugin.
 
 		log.debug 'Configuring Spring Security OAuth2 provider ...'
 
+        annotationHandlerAdapter(RequestMappingHandlerAdapter){
+            messageConverters = [
+                    new StringHttpMessageConverter(writeAcceptCharset: false),
+                    new ByteArrayHttpMessageConverter(),
+                    new FormHttpMessageConverter(),
+                    new SourceHttpMessageConverter(),
+                    new MappingJacksonHttpMessageConverter()
+            ]
+        }
+
+
 		clientDetailsService(InMemoryClientDetailsService)
 		tokenStore(InMemoryTokenStore)
 		tokenServices(DefaultTokenServices) {
@@ -95,7 +114,19 @@ OAuth2 Provider support for the Spring Security plugin.
 		
 		// Oauth namespace
 		xmlns oauth:"http://www.springframework.org/schema/security/oauth2"
-		
+		xmlns sec:"http://www.springframework.org/schema/security"
+
+        clientDetailsUserService(ClientDetailsUserDetailsService,ref("clientDetailsService"))
+
+        sec.'authentication-manager'(id:'clientAuthenticationManager'){
+            sec.'authentication-provider'('user-service-ref':'clientDetailsUserService')
+        }
+
+        clientCredentialsTokenEndpointFilter(ClientCredentialsTokenEndpointFilter){
+            authenticationManager=ref('clientAuthenticationManager')
+        }
+
+
 		oauth.'authorization-server'(
 					'client-details-service-ref':"clientDetailsService",
 					'token-services-ref':"tokenServices",

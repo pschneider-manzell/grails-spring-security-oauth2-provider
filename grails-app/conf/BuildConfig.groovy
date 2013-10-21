@@ -57,7 +57,13 @@ grails.project.dependency.resolution = {
 //			excludes 'spring-core', 'commons-logging'
 //		}
 		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.5.RELEASE', {
-			transitive = false
+            excludes 'aopalliance', 'commons-codec', 'commons-logging', 'fest-assert', 'groovy', 'hsqldb',
+                    'jcl-over-slf4j', 'junit', 'logback-classic', 'mockito-core', 'powermock-api-mockito',
+                    'powermock-api-support', 'powermock-core', 'powermock-module-junit4',
+                    'powermock-module-junit4-common', 'powermock-reflect', 'spock-core', 'spring-aop',
+                    'spring-beans', 'spring-context', 'spring-core', 'spring-expression', 'spring-jdbc',
+                    'spring-security-core', 'spring-test', 'spring-tx', 'spring-web', 'spring-webmvc',
+                    'tomcat-servlet-api'
 		}
 		compile 'org.springframework.security:spring-security-config:3.2.0.RC1', {
             excludes 'aopalliance', 'commons-codec', 'commons-logging', 'fest-assert', 'groovy', 'hsqldb',
