@@ -14,6 +14,8 @@
  */
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.oauthprovider.EnhancedTokenEndpoint
+import grails.plugin.springsecurity.oauthprovider.ExtendedGrailsExceptionResolver
 import org.apache.log4j.Logger
 import org.springframework.http.converter.ByteArrayHttpMessageConverter
 import org.springframework.http.converter.FormHttpMessageConverter
@@ -24,11 +26,17 @@ import org.springframework.security.oauth2.provider.client.ClientCredentialsToke
 import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices
 import org.springframework.security.oauth2.provider.InMemoryClientDetailsService
+import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler
+import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
 
 import grails.plugin.springsecurity.oauthprovider.SpringSecurityOAuth2ProviderUtility
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler
+import org.springframework.security.web.access.ExceptionTranslationFilter
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 
 class SpringSecurityOauth2ProviderGrailsPlugin {
@@ -116,7 +124,29 @@ OAuth2 Provider support for the Spring Security plugin.
 		xmlns oauth:"http://www.springframework.org/schema/security/oauth2"
 		xmlns sec:"http://www.springframework.org/schema/security"
 
+        clientAuthenticationEntryPoint(OAuth2AuthenticationEntryPoint){
+            realmName="test/client"
+            typeName="Basic"
+        }
+
+        sec.'http'(pattern:"/oauth/token","create-session":"stateless","authentication-manager-ref":"clientAuthenticationManager") {
+            "intercept-url"(pattern: "/oauth/token",access:"IS_AUTHENTICATED_FULLY")
+            "anonymous"(enabled:false)
+            "http-basic"("entry-point-ref":"clientAuthenticationEntryPoint")
+            "custom-filter"(ref:"clientCredentialsTokenEndpointFilter",after:"BASIC_AUTH_FILTER")
+            "access-denied-handler"(ref:"oauthAccessDeniedHandler")
+        }
+
         clientDetailsUserService(ClientDetailsUserDetailsService,ref("clientDetailsService"))
+
+        oauthAccessDeniedHandler(OAuth2AccessDeniedHandler)
+
+        oauthAuthenticationEntryPoint(OAuth2AuthenticationEntryPoint)
+
+        /** exceptionTranslationFilter */
+        oauthExceptionTranslationFilter(ExceptionTranslationFilter, ref('oauthAuthenticationEntryPoint')) {
+            accessDeniedHandler = ref('oauthAccessDeniedHandler')
+        }
 
         sec.'authentication-manager'(id:'clientAuthenticationManager'){
             sec.'authentication-provider'('user-service-ref':'clientDetailsUserService')
@@ -125,6 +155,11 @@ OAuth2 Provider support for the Spring Security plugin.
         clientCredentialsTokenEndpointFilter(ClientCredentialsTokenEndpointFilter){
             authenticationManager=ref('clientAuthenticationManager')
         }
+
+        webAsyncManagerIntegrationFilter(WebAsyncManagerIntegrationFilter)
+
+        basicAuthenticationFilter(BasicAuthenticationFilter,ref("clientAuthenticationManager"))
+
 
 
 		oauth.'authorization-server'(
@@ -162,7 +197,13 @@ OAuth2 Provider support for the Spring Security plugin.
 		// Register endpoint URL filter since we define the URLs above
 		SpringSecurityUtils.registerFilter 'oauth2ProviderFilter',
 				conf.oauthProvider.filterStartPosition + 1
-				
+        //SpringSecurityUtils.registerFilter 'clientCredentialsTokenEndpointFilter',
+        //        conf.oauthProvider.filterStartPosition + 2
+        exceptionHandler(ExtendedGrailsExceptionResolver){
+            // this is required so that calls to super work
+            exceptionMappings = ['java.lang.Exception': '/error']
+        }
+
 		log.debug "... done configured Spring Security OAuth2 provider"
 	}
 
@@ -186,7 +227,8 @@ OAuth2 Provider support for the Spring Security plugin.
 			SpringSecurityOAuth2ProviderUtility.registerClients(conf, clientDetailsService)
 		else
 			log.info("Client details service bean is not an in-memory implementation, ignoring client config")
-		
+
+
 		log.debug '... done configuring OAuth2 clients'
     }
 	

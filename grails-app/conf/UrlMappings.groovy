@@ -12,7 +12,7 @@ class UrlMappings {
 		
 		// OAuth2 Provider endpoints
 		"/oauth/confirm.dispatch"(controller:"oauth", action:"confirm")
-		"/oauth/authorize"(uri:"/oauth/authorize.dispatch")
-		"/oauth/token"(uri:"/oauth/token.dispatch")
+		//"/oauth/authorize"(uri:"/oauth/authorize.dispatch")
+		//"/oauth/token"(uri:"/oauth/token.dispatch")
 	}
 }

@@ -23,7 +23,7 @@ security {
 		
 		tokenServices {
 			accessTokenValiditySeconds = 60 * 60 * 12 //default 12 hours
-			refreshTokenValiditySeconds = 60 * 10 //default 10 minutes
+			refreshTokenValiditySeconds = 60 * 60 * 24 * 30; // default to 30 days
 			reuseRefreshToken = true
 			supportRefreshToken = true
 		}
