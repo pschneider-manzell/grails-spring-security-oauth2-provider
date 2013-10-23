@@ -8,11 +8,13 @@ import org.springframework.security.oauth2.provider.ClientAlreadyExistsException
 import org.springframework.security.oauth2.provider.ClientDetails
 import org.springframework.security.oauth2.provider.ClientDetailsService
 import org.springframework.security.oauth2.provider.ClientRegistrationException
+import org.springframework.security.oauth2.provider.ClientRegistrationService
+import org.springframework.security.oauth2.provider.NoSuchClientException
 import org.springframework.util.StringUtils
 import org.codehaus.jackson.map.ObjectMapper;
 
 @Transactional
-class GormClientDetailsService implements  ClientDetailsService{
+class GormClientDetailsService implements  ClientDetailsService,ClientRegistrationService{
 
     ObjectMapper mapper = new ObjectMapper();
 
@@ -43,6 +45,52 @@ class GormClientDetailsService implements  ClientDetailsService{
         catch (DuplicateKeyException e) {
             throw new ClientAlreadyExistsException("Client already exists: " + clientDetails.getClientId(), e);
         }
+    }
+
+    @Override
+    void updateClientDetails(ClientDetails clientDetails) throws NoSuchClientException {
+        OAuthClient persistentClient = OAuthClient.findByClientId clientDetails.clientId
+        if(!persistentClient){
+            throw new NoSuchClientException("No client with requested id: " + clientDetails.clientId)
+        }
+        OAuthClient convertedDetails = convert(clientDetails)
+        persistentClient.resourceIds=convertedDetails.resourceIds
+        persistentClient.scopes=convertedDetails.scopes
+        persistentClient.redirectUris=convertedDetails.redirectUris
+        persistentClient.authorities=convertedDetails.authorities
+        persistentClient.grantTypes=convertedDetails.grantTypes
+        persistentClient.additionalInformations=convertedDetails.additionalInformations
+        persistentClient.accessTokenValiditySeconds=convertedDetails.accessTokenValiditySeconds
+        persistentClient.refreshTokenValiditySeconds=convertedDetails.refreshTokenValiditySeconds
+        persistentClient.save(failOnError: true)
+    }
+
+    @Override
+    void updateClientSecret(String clientId, String secret) throws NoSuchClientException {
+        OAuthClient persistentClient = OAuthClient.findByClientId clientId
+        if(!persistentClient){
+            throw new NoSuchClientException("No client with requested id: " + clientId)
+        }
+        persistentClient.clientSecret = secret
+        persistentClient.save(failOnError: true)
+    }
+
+    @Override
+    void removeClientDetails(String clientId) throws NoSuchClientException {
+        OAuthClient persistentClient = OAuthClient.findByClientId clientId
+        if(!persistentClient){
+            throw new NoSuchClientException("No client with requested id: " + clientId)
+        }
+        persistentClient.delete()
+    }
+
+    @Override
+    List<ClientDetails> listClientDetails() {
+        List<ClientDetails> result = []
+        OAuthClient.list().each {OAuthClient client->
+            result.add(client.toClientDetails())
+        }
+        return result
     }
 
     private OAuthClient convert(ClientDetails clientDetails){

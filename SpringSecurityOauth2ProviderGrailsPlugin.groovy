@@ -156,7 +156,7 @@ OAuth2 Provider support for the Spring Security plugin.
 
         webAsyncManagerIntegrationFilter(WebAsyncManagerIntegrationFilter)
 
-        basicAuthenticationFilter(BasicAuthenticationFilter,ref("clientAuthenticationManager"))
+        clientBasicAuthenticationFilter(BasicAuthenticationFilter,ref("clientAuthenticationManager"))
 
 
 

@@ -149,7 +149,7 @@ class GormTokenStoreService implements TokenStore{
         OAuthAccessToken persistentAccessToken = OAuthAccessToken.findByAuthenticationId(authenticationKeyGenerator.extractKey(authentication))
         OAuth2AccessToken accessToken
         if(persistentAccessToken){
-            accessToken =  deserializeAuthentication(persistentAccessToken.authentication)
+            accessToken = persistentAccessToken.toToken()
         }
         return accessToken
     }
