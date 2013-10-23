@@ -35,7 +35,6 @@ import org.springframework.security.oauth2.provider.approval.TokenServicesUserAp
 import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 
 class SpringSecurityOauth2ProviderGrailsPlugin {

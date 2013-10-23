@@ -41,6 +41,7 @@ class SpringSecurityOAuth2ProviderUtility {
 			client.authorities = clientConfig.authorities ?: defaultConfig.authorities
 			client.accessTokenValiditySeconds = clientConfig.accessTokenValiditySeconds ?: defaultConfig.accessTokenValiditySeconds
 			client.refreshTokenValiditySeconds = clientConfig.refreshTokenValiditySeconds ?: defaultConfig.refreshTokenValiditySeconds
+			client.additionalInformation = clientConfig.additionalInformation ?: null
 
 			// Add to client details service
 			log.debug("Adding client ${client.clientId} to client details service store")
