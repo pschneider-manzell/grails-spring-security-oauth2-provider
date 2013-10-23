@@ -2,17 +2,13 @@ package grails.plugin.springsecurity.oauthprovider
 
 import org.codehaus.groovy.grails.web.errors.GrailsExceptionResolver
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpOutputMessage
 import org.springframework.http.ResponseEntity
-import org.springframework.http.server.ServerHttpResponse
 import org.springframework.http.server.ServletServerHttpResponse
 import org.springframework.security.oauth2.common.exceptions.BadClientCredentialsException
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception
-import org.springframework.security.oauth2.common.exceptions.RedirectMismatchException
 import org.springframework.security.oauth2.provider.ClientRegistrationException
 import org.springframework.security.oauth2.provider.error.DefaultWebResponseExceptionTranslator
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator
-import org.springframework.web.context.request.ServletWebRequest
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView
 

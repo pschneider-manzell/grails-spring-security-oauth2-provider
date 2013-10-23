@@ -14,7 +14,6 @@
  */
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.plugin.springsecurity.oauthprovider.EnhancedTokenEndpoint
 import grails.plugin.springsecurity.oauthprovider.ExtendedGrailsExceptionResolver
 import org.apache.log4j.Logger
 import org.springframework.http.converter.ByteArrayHttpMessageConverter
@@ -104,8 +103,8 @@ OAuth2 Provider support for the Spring Security plugin.
         }
 
 
-		clientDetailsService(InMemoryClientDetailsService)
-		tokenStore(InMemoryTokenStore)
+        clientDetailsService(conf.oauthProvider.clientDetailsServiceClass ?: InMemoryClientDetailsService)
+        tokenStore(conf.oauthProvider.tokenStoreClass ?: InMemoryTokenStore)
 		tokenServices(DefaultTokenServices) {
 			tokenStore = ref("tokenStore")
 			clientDetailsService = ref("clientDetailsService")
@@ -114,7 +113,7 @@ OAuth2 Provider support for the Spring Security plugin.
 			reuseRefreshToken = conf.oauthProvider.tokenServices.reuseRefreshToken
 			supportRefreshToken = conf.oauthProvider.tokenServices.supportRefreshToken
 		}
-		authorizationCodeServices(InMemoryAuthorizationCodeServices)
+        authorizationCodeServices(conf.oauthProvider.authorizationCodeServicesClass ?: InMemoryAuthorizationCodeServices)
 		userApprovalHandler(TokenServicesUserApprovalHandler) {
 			approvalParameter = conf.oauthProvider.userApprovalParameter
 			tokenServices = ref("tokenServices")
@@ -194,9 +193,11 @@ OAuth2 Provider support for the Spring Security plugin.
 					'token-services-ref':'tokenServices',
 		)
 
+
+
+
 		// Register endpoint URL filter since we define the URLs above
-		SpringSecurityUtils.registerFilter 'oauth2ProviderFilter',
-				conf.oauthProvider.filterStartPosition + 1
+		SpringSecurityUtils.registerFilter 'oauth2ProviderFilter',conf.oauthProvider.filterStartPosition + 1
         //SpringSecurityUtils.registerFilter 'clientCredentialsTokenEndpointFilter',
         //        conf.oauthProvider.filterStartPosition + 2
         exceptionHandler(ExtendedGrailsExceptionResolver){

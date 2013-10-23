@@ -1,4 +1,7 @@
 import grails.plugin.springsecurity.SecurityFilterPosition
+import org.springframework.security.oauth2.provider.InMemoryClientDetailsService
+import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices
+import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
 
 /* Copyright 2006-2011 the original author or authors.
  *
@@ -18,9 +21,13 @@ import grails.plugin.springsecurity.SecurityFilterPosition
 
 security {
 	oauthProvider {
+        clientDetailsServiceClass = InMemoryClientDetailsService
+        tokenStoreClass = InMemoryTokenStore
+        authorizationCodeServicesClass = InMemoryAuthorizationCodeServices
 		active = true
 		filterStartPosition = SecurityFilterPosition.X509_FILTER.order
-		
+        endpointUrlFilterPosition = filterStartPosition + 1
+
 		tokenServices {
 			accessTokenValiditySeconds = 60 * 60 * 12 //default 12 hours
 			refreshTokenValiditySeconds = 60 * 60 * 24 * 30; // default to 30 days
