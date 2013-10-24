@@ -15,6 +15,7 @@
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.oauthprovider.ExtendedGrailsExceptionResolver
+import grails.plugin.springsecurity.oauthprovider.ExtendedTokenServicesUserApprovalHandler
 import org.apache.log4j.Logger
 import org.springframework.http.converter.ByteArrayHttpMessageConverter
 import org.springframework.http.converter.FormHttpMessageConverter
@@ -113,9 +114,10 @@ OAuth2 Provider support for the Spring Security plugin.
 			supportRefreshToken = conf.oauthProvider.tokenServices.supportRefreshToken
 		}
         authorizationCodeServices(conf.oauthProvider.authorizationCodeServicesClass ?: InMemoryAuthorizationCodeServices)
-		userApprovalHandler(TokenServicesUserApprovalHandler) {
+		userApprovalHandler(ExtendedTokenServicesUserApprovalHandler) {
 			approvalParameter = conf.oauthProvider.userApprovalParameter
 			tokenServices = ref("tokenServices")
+            clientDetailsService = ref("clientDetailsService")
 		}
 		
 		// Oauth namespace
